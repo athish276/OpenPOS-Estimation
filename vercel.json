@@ -1,7 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/pos", "destination": "/public/estimation_pos.html" }
+    { "source": "/pos", "destination": "/index.html" },
+    { "source": "/estimation", "destination": "/index.html" }
   ]
 }
