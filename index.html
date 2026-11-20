@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenPOS - Estimation POS System</title>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --primary-hover: #1d4ed8;
+            --accent-green: #15803d;
+            --accent-orange: #c2410c;
+            --bg-light: #f8fafc;
+            --card-border: #cbd5e1;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1e293b;
+            padding-top: 15px;
+            padding-bottom: 30px;
+        }
+
+        .pos-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 14px 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .pos-header h3 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            display: inline-block;
+        }
+
+        .pos-badge-live {
+            background-color: #22c55e;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        .clock-display {
+            font-size: 15px;
+            font-weight: 500;
+            color: #e0e7ff;
+            float: right;
+            line-height: 32px;
+        }
+
+        .panel-pos {
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .panel-pos .panel-heading {
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #334155;
+        }
+
+        /* Fast Item Entry Bar */
+        .fast-entry-box {
+            background: #eff6ff;
+            border: 2px dashed #93c5fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 18px;
+        }
+
+        .fast-entry-box label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1e40af;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-price-highlight {
+            border: 2px solid #ea580c !important;
+            background-color: #fff7ed !important;
+            font-weight: bold;
+            font-size: 16px !important;
+            color: #c2410c !important;
+        }
+
+        /* Product Catalog Grid */
+        .category-nav {
+            margin-bottom: 12px;
+        }
+
+        .category-nav .btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .product-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 80px;
+        }
+
+        .product-card:hover {
+            border-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.15);
+            background: #f8faff;
+        }
+
+        .product-card .p-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1e293b;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .product-card .p-price {
+            font-size: 13px;
+            font-weight: 700;
+            color: #15803d;
+            background: #dcfce7;
+            border-radius: 4px;
+            padding: 2px 5px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        /* Estimate Table */
+        .table-estimate {
+            margin-bottom: 0;
+        }
+
+        .table-estimate th {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+            border-top: none;
+        }
+
+        .table-estimate td {
+            vertical-align: middle !important;
+            font-size: 13px;
+        }
+
+        .price-inline-input {
+            width: 90px;
+            padding: 4px 6px;
+            font-weight: bold;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+            background: #fff7ed;
+            border-radius: 4px;
+            text-align: right;
+        }
+
+        .price-inline-input:focus {
+            outline: none;
+            border-color: #ea580c;
+            box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
+        }
+
+        .qty-inline-input {
+            width: 65px;
+            padding: 4px 6px;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .bill-total-card {
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin-top: 15px;
+        }
+
+        .bill-total-card .grand-total-val {
+            font-size: 28px;
+            font-weight: 800;
+            color: #4ade80;
+        }
+
+        .action-btns .btn {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 6px;
+        }
+
+        /* A5 Sheet Print Configuration */
+        @page {
+            size: A5 portrait;
+            margin: 8mm;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #printableA5Sheet, #printableA5Sheet * {
+                visibility: visible !important;
+            }
+            #printableA5Sheet {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 132mm !important; /* A5 148mm - 16mm margins */
+                min-height: 194mm !important; /* A5 210mm - 16mm margins */
+                margin: 0 auto !important;
+                padding: 6mm !important;
+                background: #ffffff !important;
+                display: block !important;
+                border: 1.5px solid #0f172a !important;
+                box-sizing: border-box !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Screen Preview of A5 Sheet */
+        .a5-container {
+            width: 100%;
+            max-width: 540px;
+            margin: 15px auto;
+            border: 2px solid #334155;
+            border-radius: 6px;
+            padding: 20px;
+            background: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            color: #0f172a;
+        }
+
+        .a5-header-title {
+            text-align: center;
+            border-bottom: 2px solid #1e3a8a;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .a5-header-title h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #1e3a8a;
+        }
+
+        .a5-meta-grid {
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 11px;
+        }
+
+        .a5-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-bottom: 12px;
+        }
+
+        .a5-table th {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            border: 1px solid #1e3a8a;
+            padding: 5px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .a5-table td {
+            border: 1px solid #cbd5e1;
+            padding: 5px 6px;
+            vertical-align: middle;
+        }
+
+        .a5-summary-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1.5px solid #334155;
+        }
+
+        .a5-signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 10px;
+            font-size: 10px;
+            color: #475569;
+        }
+
+        .a5-signatures div {
+            border-top: 1px dashed #64748b;
+            padding-top: 4px;
+            width: 140px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid" style="max-width: 1400px;">
+    <!-- POS Top Navigation Header -->
+    <div class="pos-header clearfix no-print">
+        <div class="pull-left">
+            <h3><span class="glyphicon glyphicon-shopping-cart"></span> OpenPOS - Estimation POS System</h3>
+            <span class="pos-badge-live">Estimation Mode</span>
+            <span style="font-size: 12px; color: #cbd5e1; margin-left: 12px;">
+                ✓ Manual Fluctuating Price Entry Enabled
+            </span>
+        </div>
+        <div class="clock-display" id="liveClock">
+            --:--:--
+        </div>
+    </div>
+
+    <!-- Main POS Workspace -->
+    <div class="row no-print">
+        <!-- LEFT COLUMN: Item Fast Entry & Product Catalog -->
+        <div class="col-md-6">
+            <!-- 1. FAST ITEM ENTRY BOX (Direct Manual Price Input) -->
+            <div class="fast-entry-box">
+                <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 10px; font-size: 14px;">
+                    <span class="glyphicon glyphicon-pencil"></span> Quick Item & Price Entry
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-4">
+                        <label>Item Name</label>
+                        <input type="text" id="entryName" class="form-control input-sm" placeholder="e.g. Tomato, Rice" list="catalogDatalist" autofocus>
+                        <datalist id="catalogDatalist"></datalist>
+                    </div>
+                    <div class="col-xs-6 col-sm-2">
+                        <label>Qty</label>
+                        <input type="number" id="entryQty" class="form-control input-sm text-center" value="1" step="any" min="0.01">
+                    </div>
+                    <div class="col-xs-6 col-sm-2">
+                        <label>Unit</label>
+                        <select id="entryUnit" class="form-control input-sm">
+                            <option value="kg">kg</option>
+                            <option value="g">gram</option>
+                            <option value="pcs">pcs</option>
+                            <option value="pack">pack</option>
+                            <option value="ltr">ltr</option>
+                            <option value="box">box</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-8 col-sm-2">
+                        <label style="color:#c2410c;">Price ₹</label>
+                        <input type="number" id="entryPrice" class="form-control input-sm input-price-highlight text-right" placeholder="0.00" step="any">
+                    </div>
+                    <div class="col-xs-4 col-sm-2">
+                        <label>&nbsp;</label>
+                        <button id="btnAddEntry" class="btn btn-primary btn-sm btn-block" style="font-weight:bold; height: 32px;" onclick="addManualItem()">
+                            <span class="glyphicon glyphicon-plus"></span> Add
+                        </button>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 6px;">
+                    * <i>Tip: For fluctuating market prices, enter the current unit price and press Add or Enter.</i>
+                </div>
+            </div>
+
+            <!-- 2. CATALOG PANEL & CATEGORY TABS -->
+            <div class="panel panel-pos">
+                <div class="panel-heading clearfix">
+                    <div class="pull-left">
+                        <span class="glyphicon glyphicon-th"></span> Product Catalogue
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-xs btn-default" onclick="openNewProductModal()">
+                            <span class="glyphicon glyphicon-plus-sign"></span> Add New Product
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <!-- Category Filter Buttons -->
+                    <div class="category-nav" id="categoryNav">
+                        <button class="btn btn-xs btn-primary active" onclick="filterCategory('All')">All</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Vegetables')">Vegetables</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Groceries')">Groceries</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Fruits')">Fruits</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Dairy')">Dairy</button>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="product-grid" id="productGrid">
+                        <!-- Populated via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. ESTIMATION HISTORY PREVIEW -->
+            <div class="panel panel-pos">
+                <div class="panel-heading clearfix">
+                    <span class="glyphicon glyphicon-time"></span> Recent Estimations
+                    <button class="btn btn-xs btn-default pull-right" onclick="loadEstimatesHistory()">Refresh</button>
+                </div>
+                <div class="panel-body" style="max-height: 180px; overflow-y: auto; padding: 0;">
+                    <table class="table table-condensed table-striped" style="margin-bottom:0; font-size:12px;">
+                        <thead>
+                            <tr>
+                                <th>Est #</th>
+                                <th>Date / Time</th>
+                                <th>Customer</th>
+                                <th class="text-right">Total</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="5" class="text-center text-muted">No estimations saved yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Active Estimation Bill -->
+        <div class="col-md-6">
+            <div class="panel panel-pos">
+                <div class="panel-heading clearfix" style="background:#1e3a8a; color:white;">
+                    <div class="pull-left">
+                        <span class="glyphicon glyphicon-list-alt"></span> Current Estimation Bill
+                    </div>
+                    <div class="pull-right">
+                        <span id="currentBillNo" style="font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px;">
+                            EST-DRAFT
+                        </span>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 10px;">
+                    <!-- Customer Details Optional -->
+                    <div class="row" style="margin-bottom: 10px;">
+                        <div class="col-xs-6">
+                            <input type="text" id="custName" class="form-control input-sm" placeholder="Customer Name (Optional)">
+                        </div>
+                        <div class="col-xs-6">
+                            <input type="text" id="custPhone" class="form-control input-sm" placeholder="Phone Number (Optional)">
+                        </div>
+                    </div>
+
+                    <!-- Estimation Table with INLINE EDITABLE PRICE -->
+                    <div style="min-height: 250px; max-height: 360px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+                        <table class="table table-bordered table-estimate">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 35%;">Item Name</th>
+                                    <th style="width: 18%;">Qty</th>
+                                    <th style="width: 22%;">Price ₹</th>
+                                    <th style="width: 15%;" class="text-right">Total ₹</th>
+                                    <th style="width: 5%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="estimateItemsList">
+                                <tr id="emptyBillRow">
+                                    <td colspan="6" class="text-center text-muted" style="padding: 40px 10px;">
+                                        <span class="glyphicon glyphicon-inbox" style="font-size: 32px; color: #cbd5e1;"></span><br>
+                                        <b style="color: #64748b;">Estimation bill is empty</b><br>
+                                        <small>Click products on the left or type name and price to add items</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totals & Calculations -->
+                    <div class="bill-total-card">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div style="font-size: 13px; color: #94a3b8;">Items Count: <span id="billItemCount" style="color:#fff; font-weight:bold;">0</span></div>
+                                <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">
+                                    Discount (₹): 
+                                    <input type="number" id="billDiscount" class="text-right" style="width: 70px; color:#0f172a; border-radius:3px; padding:2px;" value="0" min="0" oninput="calculateTotals()">
+                                </div>
+                            </div>
+                            <div class="col-xs-6 text-right">
+                                <div style="font-size: 12px; color: #94a3b8; text-transform:uppercase;">Grand Total</div>
+                                <div class="grand-total-val">₹ <span id="billGrandTotal">0.00</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-btns" style="margin-top: 15px;">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <button class="btn btn-danger btn-block" onclick="cancelAllItems()" title="Cancel and clear all items">
+                                    <span class="glyphicon glyphicon-remove-circle"></span> Cancel All
+                                </button>
+                            </div>
+                            <div class="col-xs-4">
+                                <button class="btn btn-success btn-block" onclick="saveEstimation()" title="Save estimation to history">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span> Save
+                                </button>
+                            </div>
+                            <div class="col-xs-4">
+                                <button class="btn btn-primary btn-block" style="background:#1e40af;" onclick="printEstimationA5()" title="Print on A5 Sheet">
+                                    <span class="glyphicon glyphicon-print"></span> Print A5
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PRINTABLE A5 SHEET TEMPLATE (Configured for A5 Sheet - 148mm x 210mm) -->
+<div id="printableA5Sheet" class="a5-container" style="display: none;">
+    <div class="a5-header-title">
+        <h2>OPENPOS ESTIMATION</h2>
+        <div style="font-size: 13px; font-weight: bold; margin-top: 2px; color: #1e3a8a; letter-spacing: 1px;">
+            ESTIMATE QUOTATION (A5 SHEET)
+        </div>
+        <div style="font-size: 10px; color: #64748b; margin-top: 2px;">
+            ESTIMATION ONLY — NOT A TAX INVOICE
+        </div>
+    </div>
+
+    <div class="a5-meta-grid">
+        <div>
+            <div><b>Customer:</b> <span id="a5CustName">Cash / Walk-in</span></div>
+            <div><b>Phone:</b> <span id="a5CustPhone">-</span></div>
+        </div>
+        <div style="text-align: right;">
+            <div><b>Estimate No:</b> <span id="a5EstNo" style="font-weight: bold; color: #1e3a8a;">EST-0000</span></div>
+            <div><b>Date & Time:</b> <span id="a5Date">--/--/----</span></div>
+        </div>
+    </div>
+
+    <table class="a5-table">
+        <thead>
+            <tr>
+                <th style="width: 7%;">#</th>
+                <th style="width: 45%; text-align: left;">Item Description</th>
+                <th style="width: 16%; text-align: center;">Qty</th>
+                <th style="width: 16%; text-align: right;">Rate (₹)</th>
+                <th style="width: 16%; text-align: right;">Amount (₹)</th>
+            </tr>
+        </thead>
+        <tbody id="a5ItemsBody">
+        </tbody>
+    </table>
+
+    <div class="a5-summary-box">
+        <div style="font-size: 11px; color: #475569; max-width: 55%;">
+            <div><b>Terms & Notes:</b></div>
+            <div>• Rates are subject to daily market fluctuations.</div>
+            <div>• Valid for current estimate only.</div>
+        </div>
+        <div style="text-align: right; min-width: 180px; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>Subtotal:</span>
+                <span>₹ <span id="a5Subtotal">0.00</span></span>
+            </div>
+            <div id="a5DiscountRow" style="display: flex; justify-content: space-between; margin-bottom: 3px; color: #dc2626; display: none;">
+                <span>Discount:</span>
+                <span>- ₹ <span id="a5Discount">0.00</span></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; border-top: 1.5px solid #0f172a; padding-top: 4px; color: #15803d;">
+                <span>ESTIMATE TOTAL:</span>
+                <span>₹ <span id="a5GrandTotal">0.00</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="a5-signatures">
+        <div>Customer Signature</div>
+        <div>Authorized Signatory</div>
+    </div>
+
+    <div class="no-print" style="text-align: center; margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+        <button class="btn btn-primary" style="padding: 8px 24px; font-weight: bold;" onclick="window.print()">
+            <span class="glyphicon glyphicon-print"></span> Print A5 Now
+        </button>
+        <button class="btn btn-default" style="margin-left: 10px;" onclick="closeA5PrintView()">
+            Back to POS
+        </button>
+    </div>
+</div>
+
+<!-- Modal: Add New Product to Catalog -->
+<div class="modal fade" id="modalAddProduct" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog modal-sm" role="document" style="margin-top: 60px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" onclick="closeNewProductModal()">&times;</button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> Add Item to Catalog</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="newProdName" class="form-control" placeholder="e.g. Tomato, Sugar">
+                </div>
+                <div class="form-group">
+                    <label>Default Price ₹</label>
+                    <input type="number" id="newProdPrice" class="form-control" placeholder="0.00" step="any">
+                </div>
+                <div class="form-group">
+                    <label>Default Unit</label>
+                    <select id="newProdUnit" class="form-control">
+                        <option value="kg">kg</option>
+                        <option value="g">gram</option>
+                        <option value="pcs">pcs</option>
+                        <option value="pack">pack</option>
+                        <option value="ltr">ltr</option>
+                        <option value="box">box</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="newProdCategory" class="form-control">
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Groceries">Groceries</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Dairy">Dairy</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="closeNewProductModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitNewProduct()">Save Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State variables
+    let catalogProducts = [];
+    let activeCategory = 'All';
+    let currentEstimate = []; // Array of items: { id, name, unit, qty, price, total }
+
+    // Vanilla Modal Helpers
+    function openNewProductModal() {
+        const modal = document.getElementById('modalAddProduct');
+        modal.style.display = 'block';
+        modal.classList.add('in');
+        let backdrop = document.getElementById('modalBackdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = 'modalBackdrop';
+            backdrop.className = 'modal-backdrop fade in';
+            document.body.appendChild(backdrop);
+        }
+    }
+
+    function closeNewProductModal() {
+        const modal = document.getElementById('modalAddProduct');
+        modal.style.display = 'none';
+        modal.classList.remove('in');
+        const backdrop = document.getElementById('modalBackdrop');
+        if (backdrop) backdrop.remove();
+    }
+
+    // On Load
+    window.addEventListener('DOMContentLoaded', () => {
+        updateClock();
+        setInterval(updateClock, 1000);
+        loadCatalog();
+        loadEstimatesHistory();
+
+        // Keyboard Shortcut: Enter on Fast Entry adds the item
+        document.getElementById('entryName').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('entryPrice').focus();
+        });
+        document.getElementById('entryPrice').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addManualItem();
+        });
+        document.getElementById('entryQty').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('entryPrice').focus();
+        });
+
+        // Autocomplete selection
+        document.getElementById('entryName').addEventListener('change', (e) => {
+            const val = e.target.value.trim().toLowerCase();
+            const found = catalogProducts.find(p => p.name.toLowerCase() === val);
+            if (found) {
+                document.getElementById('entryPrice').value = found.default_price || '';
+                document.getElementById('entryUnit').value = found.unit || 'kg';
+                document.getElementById('entryPrice').focus();
+            }
+        });
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        document.getElementById('liveClock').innerText = now.toLocaleDateString('en-US', options);
+    }
+
+    const defaultCatalogSeed = [
+        { id: 1, name: "Tomato", default_price: 40.0, unit: "kg", category: "Vegetables" },
+        { id: 2, name: "Onion", default_price: 50.0, unit: "kg", category: "Vegetables" },
+        { id: 3, name: "Potato", default_price: 35.0, unit: "kg", category: "Vegetables" },
+        { id: 4, name: "Carrot", default_price: 60.0, unit: "kg", category: "Vegetables" },
+        { id: 5, name: "Green Chilli", default_price: 80.0, unit: "kg", category: "Vegetables" },
+        { id: 6, name: "Ponni Rice", default_price: 62.0, unit: "kg", category: "Groceries" },
+        { id: 7, name: "Toor Dal", default_price: 160.0, unit: "kg", category: "Groceries" },
+        { id: 8, name: "Sugar", default_price: 44.0, unit: "kg", category: "Groceries" },
+        { id: 9, name: "Sunflower Oil", default_price: 145.0, unit: "ltr", category: "Groceries" },
+        { id: 10, name: "Atta Flour", default_price: 52.0, unit: "kg", category: "Groceries" },
+        { id: 11, name: "Apple", default_price: 180.0, unit: "kg", category: "Fruits" },
+        { id: 12, name: "Banana", default_price: 50.0, unit: "dozen", category: "Fruits" },
+        { id: 13, name: "Milk", default_price: 30.0, unit: "packet", category: "Dairy" },
+        { id: 14, name: "Tea Powder", default_price: 95.0, unit: "pack", category: "Groceries" },
+        { id: 15, name: "Coffee Powder", default_price: 120.0, unit: "pack", category: "Groceries" }
+    ];
+
+    // 1. Fetch & Render Catalog
+    async function loadCatalog() {
+        try {
+            const res = await fetch('/api/products');
+            if (res.ok) {
+                catalogProducts = await res.json();
+            } else {
+                throw new Error("API not available");
+            }
+        } catch (err) {
+            const stored = localStorage.getItem('openpos_catalog');
+            if (stored) {
+                catalogProducts = JSON.parse(stored);
+            } else {
+                catalogProducts = defaultCatalogSeed;
+                localStorage.setItem('openpos_catalog', JSON.stringify(defaultCatalogSeed));
+            }
+        }
+        renderCatalog();
+        updateDatalist();
+    }
+
+    function updateDatalist() {
+        const dl = document.getElementById('catalogDatalist');
+        dl.innerHTML = '';
+        catalogProducts.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            opt.label = '₹' + Number(p.default_price).toFixed(2) + '/' + p.unit;
+            dl.appendChild(opt);
+        });
+    }
+
+    function filterCategory(cat) {
+        activeCategory = cat;
+        const btns = document.querySelectorAll('#categoryNav .btn');
+        btns.forEach(b => {
+            if (b.innerText === cat || (cat === 'All' && b.innerText === 'All')) {
+                b.className = 'btn btn-xs btn-primary active';
+            } else {
+                b.className = 'btn btn-xs btn-default';
+            }
+        });
+        renderCatalog();
+    }
+
+    function renderCatalog() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
+        const filtered = activeCategory === 'All' 
+            ? catalogProducts 
+            : catalogProducts.filter(p => p.category === activeCategory);
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: #94a3b8;">No products in this category.</div>';
+            return;
+        }
+
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.onclick = () => selectCatalogItem(p);
+            card.innerHTML = `
+                <div style="position: relative;">
+                    <button class="btn btn-xs btn-link text-danger" style="position: absolute; right: -6px; top: -8px; padding: 0 4px; font-size: 14px; text-decoration: none;" title="Delete product from catalog" onclick="deleteProduct(${p.id}, event)">
+                        &times;
+                    </button>
+                    <div class="p-name" style="padding-right: 12px;">${p.name}</div>
+                    <div style="font-size: 11px; color: #64748b;">${p.category}</div>
+                </div>
+                <div>
+                    <span class="p-price">₹ ${Number(p.default_price).toFixed(2)}</span>
+                    <span style="font-size: 10px; color: #64748b;">/${p.unit}</span>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    async function deleteProduct(id, e) {
+        if (e) e.stopPropagation();
+        if (!confirm("Delete this product from catalog?")) return;
+        try {
+            await fetch('/api/products/' + id, { method: 'DELETE' });
+            loadCatalog();
+        } catch(err) {
+            alert(err.message);
+        }
+    }
+
+    // When an item card is clicked: Populate fast entry with price focused for instant adjustment
+    function selectCatalogItem(p) {
+        document.getElementById('entryName').value = p.name;
+        document.getElementById('entryUnit').value = p.unit || 'kg';
+        document.getElementById('entryPrice').value = p.default_price || '';
+        document.getElementById('entryQty').value = '1';
+        
+        // Directly add to estimate, with price editable in the table row
+        addItemToEstimate({
+            name: p.name,
+            unit: p.unit || 'kg',
+            qty: 1,
+            price: parseFloat(p.default_price) || 0
+        });
+
+        // Also focus price in entry box for quick feedback
+        const priceInput = document.getElementById('entryPrice');
+        priceInput.focus();
+        priceInput.select();
+    }
+
+    // 2. Add Item from Manual Entry Form
+    function addManualItem() {
+        const nameInput = document.getElementById('entryName');
+        const qtyInput = document.getElementById('entryQty');
+        const unitInput = document.getElementById('entryUnit');
+        const priceInput = document.getElementById('entryPrice');
+
+        const name = nameInput.value.trim();
+        const qty = parseFloat(qtyInput.value) || 1;
+        const unit = unitInput.value;
+        const price = parseFloat(priceInput.value);
+
+        if (!name) {
+            alert("Please enter the item name");
+            nameInput.focus();
+            return;
+        }
+
+        if (isNaN(price) || price < 0) {
+            alert("Please enter a valid price");
+            priceInput.focus();
+            return;
+        }
+
+        addItemToEstimate({
+            name: name,
+            unit: unit,
+            qty: qty,
+            price: price
+        });
+
+        // Reset fast entry inputs
+        nameInput.value = '';
+        qtyInput.value = '1';
+        priceInput.value = '';
+        nameInput.focus();
+    }
+
+    function addItemToEstimate(item) {
+        // Check if item with same name & unit exists; if so, update qty
+        const existingIndex = currentEstimate.findIndex(x => x.name.toLowerCase() === item.name.toLowerCase() && x.unit === item.unit);
+        if (existingIndex > -1) {
+            currentEstimate[existingIndex].qty += item.qty;
+            // update price to latest manual price entered
+            currentEstimate[existingIndex].price = item.price;
+            currentEstimate[existingIndex].total = currentEstimate[existingIndex].qty * item.price;
+        } else {
+            currentEstimate.push({
+                id: Date.now() + Math.random(),
+                name: item.name,
+                unit: item.unit,
+                qty: item.qty,
+                price: item.price,
+                total: item.qty * item.price
+            });
+        }
+        renderEstimateTable();
+    }
+
+    // 3. Render Estimate Table with INLINE EDITABLE PRICE & QTY
+    function renderEstimateTable() {
+        const tbody = document.getElementById('estimateItemsList');
+        if (currentEstimate.length === 0) {
+            tbody.innerHTML = `
+                <tr id="emptyBillRow">
+                    <td colspan="6" class="text-center text-muted" style="padding: 40px 10px;">
+                        <span class="glyphicon glyphicon-inbox" style="font-size: 32px; color: #cbd5e1;"></span><br>
+                        <b style="color: #64748b;">Estimation bill is empty</b><br>
+                        <small>Click products or enter custom item and price above</small>
+                    </td>
+                </tr>
+            `;
+            calculateTotals();
+            return;
+        }
+
+        tbody.innerHTML = '';
+        currentEstimate.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-center" style="color:#64748b;">${index + 1}</td>
+                <td>
+                    <b>${item.name}</b>
+                    <span style="font-size:11px; color:#64748b; margin-left:4px;">(${item.unit})</span>
+                </td>
+                <td class="text-center">
+                    <input type="number" class="qty-inline-input" value="${item.qty}" step="any" min="0.01" 
+                           onchange="updateItemQty(${index}, this.value)" onkeyup="updateItemQty(${index}, this.value)">
+                </td>
+                <td class="text-center">
+                    <div style="display:flex; align-items:center; justify-content:center;">
+                        <span style="color:#ea580c; font-weight:bold; margin-right:3px;">₹</span>
+                        <input type="number" class="price-inline-input" value="${item.price}" step="any" min="0" 
+                               title="Edit fluctuating price" 
+                               onchange="updateItemPrice(${index}, this.value)" onkeyup="updateItemPrice(${index}, this.value)">
+                    </div>
+                </td>
+                <td class="text-right" style="font-weight:bold; color:#1e3a8a; font-size:14px;">
+                    ₹ ${(item.qty * item.price).toFixed(2)}
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-xs btn-danger" title="Remove Item" onclick="removeEstimateItem(${index})">
+                        &times;
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        calculateTotals();
+    }
+
+    // Dynamic Price Modification in Table Row
+    function updateItemPrice(index, newPriceVal) {
+        const val = parseFloat(newPriceVal);
+        if (!isNaN(val) && val >= 0) {
+            currentEstimate[index].price = val;
+            currentEstimate[index].total = currentEstimate[index].qty * val;
+            calculateTotals();
+            // Update row total cell
+            const tbody = document.getElementById('estimateItemsList');
+            const row = tbody.children[index];
+            if (row) {
+                row.children[4].innerText = '₹ ' + (currentEstimate[index].qty * val).toFixed(2);
+            }
+        }
+    }
+
+    function updateItemQty(index, newQtyVal) {
+        const val = parseFloat(newQtyVal);
+        if (!isNaN(val) && val > 0) {
+            currentEstimate[index].qty = val;
+            currentEstimate[index].total = val * currentEstimate[index].price;
+            calculateTotals();
+            const tbody = document.getElementById('estimateItemsList');
+            const row = tbody.children[index];
+            if (row) {
+                row.children[4].innerText = '₹ ' + (val * currentEstimate[index].price).toFixed(2);
+            }
+        }
+    }
+
+    function removeEstimateItem(index) {
+        currentEstimate.splice(index, 1);
+        renderEstimateTable();
+    }
+
+    function cancelAllItems() {
+        if (currentEstimate.length === 0) {
+            alert("No items in the bill to cancel.");
+            return;
+        }
+        if (confirm("Cancel all items in the estimation bill?")) {
+            currentEstimate = [];
+            document.getElementById('custName').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('billDiscount').value = '0';
+            document.getElementById('currentBillNo').innerText = 'EST-DRAFT';
+            document.getElementById('entryName').value = '';
+            document.getElementById('entryPrice').value = '';
+            document.getElementById('entryQty').value = '1';
+            renderEstimateTable();
+            alert("All items have been canceled.");
+        }
+    }
+
+    function clearCurrentBill() {
+        cancelAllItems();
+    }
+
+    function calculateTotals() {
+        let subtotal = 0;
+        let count = 0;
+        currentEstimate.forEach(item => {
+            subtotal += (item.qty * item.price);
+            count += 1;
+        });
+
+        const discountInput = parseFloat(document.getElementById('billDiscount').value) || 0;
+        const grandTotal = Math.max(0, subtotal - discountInput);
+
+        document.getElementById('billItemCount').innerText = count;
+        document.getElementById('billGrandTotal').innerText = grandTotal.toFixed(2);
+    }
+
+    // 4. Save Estimation
+    async function saveEstimation() {
+        if (currentEstimate.length === 0) {
+            alert("Bill is empty. Cannot save.");
+            return;
+        }
+
+        let subtotal = 0;
+        currentEstimate.forEach(item => subtotal += (item.qty * item.price));
+        const discount = parseFloat(document.getElementById('billDiscount').value) || 0;
+        const grandTotal = Math.max(0, subtotal - discount);
+
+        const payload = {
+            items: currentEstimate,
+            subtotal: subtotal,
+            discount: discount,
+            grand_total: grandTotal,
+            customer_name: document.getElementById('custName').value.trim(),
+            customer_phone: document.getElementById('custPhone').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/estimates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
+                    alert(`Estimate saved successfully!\nEstimate No: ${data.estimate_no}\nTotal: ₹${grandTotal.toFixed(2)}`);
+                    document.getElementById('currentBillNo').innerText = data.estimate_no;
+                    loadEstimatesHistory();
+                    return;
+                }
+            }
+            throw new Error("Offline save");
+        } catch (err) {
+            let history = JSON.parse(localStorage.getItem('openpos_estimates') || '[]');
+            const estNo = 'EST-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + String(history.length + 1).padStart(4, '0');
+            const newRecord = {
+                id: Date.now(),
+                estimate_no: estNo,
+                created_at: new Date().toLocaleString('en-US'),
+                customer_name: payload.customer_name,
+                customer_phone: payload.customer_phone,
+                subtotal: payload.subtotal,
+                discount: payload.discount,
+                grand_total: payload.grand_total,
+                items: payload.items
+            };
+            history.unshift(newRecord);
+            localStorage.setItem('openpos_estimates', JSON.stringify(history));
+            alert(`Estimate saved successfully!\nEstimate No: ${estNo}\nTotal: ₹${grandTotal.toFixed(2)}`);
+            document.getElementById('currentBillNo').innerText = estNo;
+            loadEstimatesHistory();
+        }
+    }
+
+    // 5. Print Estimation Sheet (A5 Format: 148mm x 210mm)
+    function printEstimationA5() {
+        if (currentEstimate.length === 0) {
+            alert("Estimation bill is empty. Please add items before printing.");
+            return;
+        }
+
+        let subtotal = 0;
+        currentEstimate.forEach(item => subtotal += (item.qty * item.price));
+        const discount = parseFloat(document.getElementById('billDiscount').value) || 0;
+        const grandTotal = Math.max(0, subtotal - discount);
+
+        const custName = document.getElementById('custName').value.trim();
+        const custPhone = document.getElementById('custPhone').value.trim();
+        const estNo = document.getElementById('currentBillNo').innerText;
+
+        document.getElementById('a5EstNo').innerText = estNo === 'EST-DRAFT' ? ('EST-' + Date.now().toString().slice(-6)) : estNo;
+        document.getElementById('a5Date').innerText = new Date().toLocaleString('en-US');
+        document.getElementById('a5CustName').innerText = custName || 'Cash / Walk-in Customer';
+        document.getElementById('a5CustPhone').innerText = custPhone || 'N/A';
+
+        const tbody = document.getElementById('a5ItemsBody');
+        tbody.innerHTML = '';
+        currentEstimate.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="text-align: center; color: #64748b;">${idx + 1}</td>
+                <td><b>${item.name}</b></td>
+                <td style="text-align: center;">${item.qty} ${item.unit}</td>
+                <td style="text-align: right;">${item.price.toFixed(2)}</td>
+                <td style="text-align: right; font-weight: 600;">${(item.qty * item.price).toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('a5Subtotal').innerText = subtotal.toFixed(2);
+        if (discount > 0) {
+            document.getElementById('a5DiscountRow').style.display = 'flex';
+            document.getElementById('a5Discount').innerText = discount.toFixed(2);
+        } else {
+            document.getElementById('a5DiscountRow').style.display = 'none';
+        }
+        document.getElementById('a5GrandTotal').innerText = grandTotal.toFixed(2);
+
+        // Display A5 Sheet container and trigger window.print
+        const a5Sheet = document.getElementById('printableA5Sheet');
+        a5Sheet.style.display = 'block';
+        a5Sheet.scrollIntoView({ behavior: 'smooth' });
+        window.print();
+    }
+
+    function printEstimationSlip() {
+        printEstimationA5();
+    }
+
+    function closeA5PrintView() {
+        document.getElementById('printableA5Sheet').style.display = 'none';
+    }
+
+    function closePrintView() {
+        closeA5PrintView();
+    }
+
+    // 6. Recent Estimations History
+    async function loadEstimatesHistory() {
+        let data = [];
+        try {
+            const res = await fetch('/api/estimates');
+            if (res.ok) {
+                data = await res.json();
+            } else {
+                throw new Error("API not available");
+            }
+        } catch (err) {
+            data = JSON.parse(localStorage.getItem('openpos_estimates') || '[]');
+        }
+
+        const tbody = document.getElementById('historyTableBody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No estimations saved yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${item.estimate_no}</b></td>
+                <td style="font-size:11px;">${item.created_at}</td>
+                <td>${item.customer_name || '-'}</td>
+                <td class="text-right" style="font-weight:bold; color:#15803d;">₹ ${Number(item.grand_total).toFixed(2)}</td>
+                <td class="text-center">
+                    <button class="btn btn-xs btn-info" title="Reload into bill" onclick='reloadEstimate(${JSON.stringify(item)})'>
+                        <span class="glyphicon glyphicon-open"></span>
+                    </button>
+                    <button class="btn btn-xs btn-danger" title="Delete" onclick="deleteEstimate(${item.id})">
+                        &times;
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function reloadEstimate(est) {
+        if (currentEstimate.length > 0 && !confirm("Replace current bill with this past estimate?")) {
+            return;
+        }
+        currentEstimate = est.items || [];
+        document.getElementById('currentBillNo').innerText = est.estimate_no;
+        document.getElementById('custName').value = est.customer_name || '';
+        document.getElementById('custPhone').value = est.customer_phone || '';
+        document.getElementById('billDiscount').value = est.discount || 0;
+        renderEstimateTable();
+    }
+
+    async function deleteEstimate(id) {
+        if (!confirm("Are you sure you want to delete this estimate?")) return;
+        try {
+            await fetch('/api/estimates/' + id, { method: 'DELETE' });
+        } catch (err) {}
+        let history = JSON.parse(localStorage.getItem('openpos_estimates') || '[]');
+        history = history.filter(h => h.id != id);
+        localStorage.setItem('openpos_estimates', JSON.stringify(history));
+        loadEstimatesHistory();
+    }
+
+    // 7. Modal for adding new catalog product
+    async function submitNewProduct() {
+        const name = document.getElementById('newProdName').value.trim();
+        const price = parseFloat(document.getElementById('newProdPrice').value) || 0;
+        const unit = document.getElementById('newProdUnit').value;
+        const category = document.getElementById('newProdCategory').value;
+
+        if (!name) {
+            alert("Item name is required");
+            return;
+        }
+
+        const newProd = { id: Date.now(), name, default_price: price, unit, category };
+        try {
+            const res = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newProd)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.id) newProd.id = data.id;
+            }
+        } catch (err) {}
+
+        catalogProducts.push(newProd);
+        localStorage.setItem('openpos_catalog', JSON.stringify(catalogProducts));
+        closeNewProductModal();
+        document.getElementById('newProdName').value = '';
+        document.getElementById('newProdPrice').value = '';
+        renderCatalog();
+        updateDatalist();
+    }
+</script>
+</body>
+</html>

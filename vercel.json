@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "public": true,
+  "rewrites": [
+    { "source": "/", "destination": "/public/estimation_pos.html" },
+    { "source": "/pos", "destination": "/public/estimation_pos.html" }
+  ]
+}
