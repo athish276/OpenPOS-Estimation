@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenPOS - Estimation POS System</title>
+    <title>SHRI MURUGAN PAINTS - Estimation POS</title>
     <link rel="stylesheet" href="/css/bootstrap.css">
     <style>
         :root {
@@ -24,7 +24,7 @@
         }
 
         .pos-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
             color: #ffffff;
             border-radius: 8px;
             padding: 14px 22px;
@@ -34,8 +34,9 @@
 
         .pos-header h3 {
             margin: 0;
-            font-weight: 700;
-            font-size: 22px;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: 0.5px;
             display: inline-block;
         }
 
@@ -47,6 +48,17 @@
             font-size: 12px;
             font-weight: 600;
             margin-left: 12px;
+        }
+
+        .contact-badge {
+            background-color: #facc15;
+            color: #854d0e;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-left: 12px;
+            display: inline-block;
         }
 
         .clock-display {
@@ -81,6 +93,7 @@
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 18px;
+            position: relative;
         }
 
         .fast-entry-box label {
@@ -100,35 +113,91 @@
             color: #c2410c !important;
         }
 
-        /* Product Catalog Grid */
-        .category-nav {
-            margin-bottom: 12px;
+        /* FLOATING DROPDOWN LIST VIEW FOR SEARCH SUGGESTIONS */
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 15px;
+            right: 15px;
+            max-height: 280px;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 2px solid #2563eb;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
         }
 
-        .category-nav .btn {
-            margin-right: 5px;
-            margin-bottom: 5px;
-            font-weight: 500;
+        .suggestion-item {
+            padding: 8px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s ease;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover, .suggestion-item.active {
+            background-color: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        .suggestion-item .item-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .suggestion-item .item-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #0f172a;
+        }
+
+        .suggestion-item .item-sub {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .suggestion-item .item-price {
+            font-weight: 700;
+            font-size: 14px;
+            color: #c2410c;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        /* Product Cards Grid */
+        .category-nav {
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 10px;
-            max-height: 320px;
+            max-height: 480px;
             overflow-y: auto;
             padding: 4px;
         }
 
         .product-card {
-            background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             padding: 10px 8px;
-            text-align: center;
+            background: #ffffff;
             cursor: pointer;
-            transition: all 0.15s ease-in-out;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: all 0.15s ease;
+            text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -138,105 +207,107 @@
         .product-card:hover {
             border-color: #2563eb;
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.15);
-            background: #f8faff;
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.15);
         }
 
-        .product-card .p-name {
+        .p-name {
             font-weight: 600;
-            font-size: 13px;
-            color: #1e293b;
-            line-height: 1.2;
-            margin-bottom: 4px;
-        }
-
-        .product-card .p-price {
-            font-size: 13px;
-            font-weight: 700;
-            color: #15803d;
-            background: #dcfce7;
-            border-radius: 4px;
-            padding: 2px 5px;
-            margin-top: 5px;
-            display: inline-block;
-        }
-
-        /* Estimate Table */
-        .table-estimate {
-            margin-bottom: 0;
-        }
-
-        .table-estimate th {
-            background: #f1f5f9;
-            color: #475569;
             font-size: 12px;
-            font-weight: 600;
-            text-align: center;
-            vertical-align: middle;
-            border-top: none;
+            color: #0f172a;
+            line-height: 1.25;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
 
-        .table-estimate td {
-            vertical-align: middle !important;
+        .p-price {
+            font-weight: 700;
             font-size: 13px;
+            color: var(--accent-orange);
+            margin-top: 4px;
         }
 
+        /* Current Estimate Table */
+        .bill-table-container {
+            max-height: 420px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        .bill-table th {
+            background-color: #f1f5f9;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .bill-table td {
+            vertical-align: middle !important;
+        }
+
+        /* Editable inputs in Table */
         .price-inline-input {
-            width: 90px;
-            padding: 4px 6px;
-            font-weight: bold;
-            color: #c2410c;
+            width: 80px;
             border: 1px solid #fdba74;
-            background: #fff7ed;
+            background-color: #fff7ed;
+            color: #c2410c;
+            font-weight: 700;
             border-radius: 4px;
+            padding: 3px 6px;
             text-align: right;
         }
 
         .price-inline-input:focus {
-            outline: none;
             border-color: #ea580c;
+            outline: none;
             box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
         }
 
         .qty-inline-input {
-            width: 65px;
-            padding: 4px 6px;
-            font-weight: 600;
+            width: 60px;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
+            padding: 3px 6px;
             text-align: center;
         }
 
+        .qty-inline-input:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+
+        /* Bill Totals Summary */
         .bill-total-card {
             background: #0f172a;
-            color: #f8fafc;
+            color: #ffffff;
             border-radius: 6px;
             padding: 14px 18px;
             margin-top: 15px;
         }
 
-        .bill-total-card .grand-total-val {
+        .grand-total-val {
             font-size: 28px;
             font-weight: 800;
             color: #4ade80;
         }
 
-        .action-btns .btn {
-            font-size: 14px;
-            font-weight: 600;
-            padding: 10px 16px;
-            border-radius: 6px;
-        }
-
-        /* A5 Sheet Print Configuration */
-        @page {
-            size: A5 portrait;
-            margin: 8mm;
-        }
-
+        /* PRINT STYLING - STRICT A5 SHEET (148mm x 210mm) */
         @media print {
             body * {
                 visibility: hidden !important;
+            }
+            .no-print, .no-print * {
+                display: none !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             #printableA5Sheet, #printableA5Sheet * {
                 visibility: visible !important;
@@ -245,66 +316,49 @@
                 position: absolute !important;
                 left: 0 !important;
                 top: 0 !important;
-                width: 132mm !important; /* A5 148mm - 16mm margins */
-                min-height: 194mm !important; /* A5 210mm - 16mm margins */
-                margin: 0 auto !important;
-                padding: 6mm !important;
-                background: #ffffff !important;
+                width: 100% !important;
                 display: block !important;
-                border: 1.5px solid #0f172a !important;
-                box-sizing: border-box !important;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
-            .no-print {
-                display: none !important;
+            @page {
+                size: A5 portrait;
+                margin: 8mm;
             }
         }
 
-        /* Screen Preview of A5 Sheet */
         .a5-container {
-            width: 100%;
-            max-width: 540px;
-            margin: 15px auto;
-            border: 2px solid #334155;
-            border-radius: 6px;
-            padding: 20px;
+            width: 140mm;
+            margin: 0 auto;
             background: #ffffff;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            color: #0f172a;
+            color: #000;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .a5-header-title {
             text-align: center;
             border-bottom: 2px solid #1e3a8a;
             padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-
-        .a5-header-title h2 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            color: #1e3a8a;
+            margin-bottom: 10px;
         }
 
         .a5-meta-grid {
             display: flex;
             justify-content: space-between;
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            padding: 8px 12px;
-            margin-bottom: 12px;
-            font-size: 11px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            line-height: 1.5;
         }
 
         .a5-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .a5-table th {
@@ -335,7 +389,7 @@
         .a5-signatures {
             display: flex;
             justify-content: space-between;
-            margin-top: 30px;
+            margin-top: 25px;
             padding-top: 10px;
             font-size: 10px;
             color: #475569;
@@ -355,11 +409,13 @@
     <!-- POS Top Navigation Header -->
     <div class="pos-header clearfix no-print">
         <div class="pull-left">
-            <h3><span class="glyphicon glyphicon-shopping-cart"></span> OpenPOS - Estimation POS System</h3>
-            <span class="pos-badge-live">Estimation Mode</span>
-            <span style="font-size: 12px; color: #cbd5e1; margin-left: 12px;">
-                ✓ Manual Fluctuating Price Entry Enabled
-            </span>
+            <h3 style="margin:0; font-weight:800; letter-spacing:0.5px;">
+                <span class="glyphicon glyphicon-tint"></span> SHRI MURUGAN PAINTS
+            </h3>
+            <span class="pos-badge-live">Estimation POS</span>
+            <div class="contact-badge">
+                <span class="glyphicon glyphicon-earphone"></span> 9940402460 / 9150585444
+            </div>
         </div>
         <div class="clock-display" id="liveClock">
             --:--:--
@@ -370,16 +426,17 @@
     <div class="row no-print">
         <!-- LEFT COLUMN: Item Fast Entry & Product Catalog -->
         <div class="col-md-6">
-            <!-- 1. FAST ITEM ENTRY BOX (Direct Manual Price Input) -->
+            <!-- 1. FAST ITEM ENTRY BOX (Direct Manual Price Input with Instant Floating Suggestions List View) -->
             <div class="fast-entry-box">
                 <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 10px; font-size: 14px;">
                     <span class="glyphicon glyphicon-pencil"></span> Quick Item & Price Entry
                 </div>
                 <div class="row">
-                    <div class="col-xs-12 col-sm-4">
+                    <div class="col-xs-12 col-sm-4" style="position: relative;">
                         <label>Item Name</label>
-                        <input type="text" id="entryName" class="form-control input-sm" placeholder="e.g. Tomato, Rice" list="catalogDatalist" autofocus>
-                        <datalist id="catalogDatalist"></datalist>
+                        <input type="text" id="entryName" class="form-control input-sm" placeholder="Type item (e.g. Sheenlac, Thinner)" autocomplete="off" autofocus>
+                        <!-- FLOATING LIST VIEW DROPDOWN -->
+                        <div id="entrySuggestionsDropdown" class="suggestions-dropdown" style="display: none;"></div>
                     </div>
                     <div class="col-xs-6 col-sm-2">
                         <label>Qty</label>
@@ -388,12 +445,15 @@
                     <div class="col-xs-6 col-sm-2">
                         <label>Unit</label>
                         <select id="entryUnit" class="form-control input-sm">
-                            <option value="kg">kg</option>
-                            <option value="g">gram</option>
                             <option value="pcs">pcs</option>
-                            <option value="pack">pack</option>
                             <option value="ltr">ltr</option>
+                            <option value="kg">kg</option>
+                            <option value="pack">pack</option>
                             <option value="box">box</option>
+                            <option value="g">gram</option>
+                            <option value="ml">ml</option>
+                            <option value="can">can</option>
+                            <option value="tin">tin</option>
                         </select>
                     </div>
                     <div class="col-xs-8 col-sm-2">
@@ -408,7 +468,7 @@
                     </div>
                 </div>
                 <div style="font-size: 11px; color: #64748b; margin-top: 6px;">
-                    * <i>Tip: For fluctuating market prices, enter the current unit price and press Add or Enter.</i>
+                    * <i>Type item name to view instant suggestions list. Arrow keys or click to select, enter current price, and press Add or Enter.</i>
                 </div>
             </div>
 
@@ -436,12 +496,13 @@
                         <button class="btn btn-xs btn-default" onclick="filterCategory('Auto Paints')">Auto</button>
                         <button class="btn btn-xs btn-default" onclick="filterCategory('Brushes & Tools')">Brushes & Tools</button>
                         <button class="btn btn-xs btn-default" onclick="filterCategory('Wood Finish')">Wood Finish</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('General Hardware')">Hardware</button>
                     </div>
 
                     <!-- Search Bar -->
                     <div style="margin-bottom: 12px; position: relative;">
                         <input type="text" id="catalogSearchInput" class="form-control input-sm" 
-                               placeholder="🔍 Search 14,000+ items (e.g. Sheenlac, Thinner, Necol, 1 Ltr, Primer)..." 
+                               placeholder="🔍 Search 14,900+ paint & hardware items..." 
                                oninput="onSearchCatalog(this.value)">
                         <span id="searchResultCount" style="position: absolute; right: 10px; top: 6px; font-size: 11px; color: #64748b; font-weight: 600;"></span>
                     </div>
@@ -468,55 +529,59 @@
                     <table class="table table-condensed table-striped" style="margin-bottom:0; font-size:12px;">
                         <thead>
                             <tr>
-                                <th>Est #</th>
-                                <th>Date / Time</th>
+                                <th>Est No</th>
+                                <th>Date</th>
                                 <th>Customer</th>
-                                <th class="text-right">Total</th>
-                                <th class="text-center">Action</th>
+                                <th class="text-right">Grand Total</th>
+                                <th class="text-center" style="width: 80px;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody">
-                            <tr><td colspan="5" class="text-center text-muted">No estimations saved yet.</td></tr>
+                            <tr><td colspan="5" class="text-center text-muted">Loading past estimations...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Active Estimation Bill -->
+        <!-- RIGHT COLUMN: Current Bill Estimation Workspace -->
         <div class="col-md-6">
             <div class="panel panel-pos">
-                <div class="panel-heading clearfix" style="background:#1e3a8a; color:white;">
+                <div class="panel-heading clearfix" style="background: #1e3a8a; color: #ffffff;">
                     <div class="pull-left">
-                        <span class="glyphicon glyphicon-list-alt"></span> Current Estimation Bill
+                        <span class="glyphicon glyphicon-list-alt"></span> <b>SHRI MURUGAN PAINTS</b> - Bill Estimation
                     </div>
-                    <div class="pull-right">
-                        <span id="currentBillNo" style="font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px;">
-                            EST-DRAFT
-                        </span>
+                    <div class="pull-right" style="font-size: 12px; color: #facc15; font-weight: bold;">
+                        <span class="glyphicon glyphicon-earphone"></span> 9940402460 / 9150585444
                     </div>
                 </div>
-                <div class="panel-body" style="padding: 10px;">
-                    <!-- Customer Details Optional -->
-                    <div class="row" style="margin-bottom: 10px;">
+                <div class="panel-body">
+                    <!-- Customer Details Bar -->
+                    <div class="row" style="margin-bottom: 12px;">
                         <div class="col-xs-6">
-                            <input type="text" id="custName" class="form-control input-sm" placeholder="Customer Name (Optional)">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                <input type="text" id="custName" class="form-control" placeholder="Customer Name (Optional)">
+                            </div>
                         </div>
                         <div class="col-xs-6">
-                            <input type="text" id="custPhone" class="form-control input-sm" placeholder="Phone Number (Optional)">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
+                                <input type="text" id="custPhone" class="form-control" placeholder="Phone / Contact No">
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Estimation Table with INLINE EDITABLE PRICE -->
-                    <div style="min-height: 250px; max-height: 360px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
-                        <table class="table table-bordered table-estimate">
+                    <!-- Current Bill Items Table -->
+                    <div class="bill-table-container">
+                        <table class="table table-hover bill-table" style="margin-bottom: 0;">
                             <thead>
                                 <tr>
-                                    <th style="width: 5%;">#</th>
-                                    <th style="width: 35%;">Item Name</th>
-                                    <th style="width: 18%;">Qty</th>
-                                    <th style="width: 22%;">Price ₹</th>
-                                    <th style="width: 15%;" class="text-right">Total ₹</th>
+                                    <th style="width: 6%;" class="text-center">#</th>
+                                    <th style="width: 44%;">Item</th>
+                                    <th style="width: 15%;" class="text-center">Qty</th>
+                                    <th style="width: 17%;" class="text-center">Price (₹)</th>
+                                    <th style="width: 13%;" class="text-right">Total</th>
                                     <th style="width: 5%;"></th>
                                 </tr>
                             </thead>
@@ -525,7 +590,7 @@
                                     <td colspan="6" class="text-center text-muted" style="padding: 40px 10px;">
                                         <span class="glyphicon glyphicon-inbox" style="font-size: 32px; color: #cbd5e1;"></span><br>
                                         <b style="color: #64748b;">Estimation bill is empty</b><br>
-                                        <small>Click products on the left or type name and price to add items</small>
+                                        <small>Type item name above or click products from catalog to add</small>
                                     </td>
                                 </tr>
                             </tbody>
@@ -539,7 +604,7 @@
                                 <div style="font-size: 13px; color: #94a3b8;">Items Count: <span id="billItemCount" style="color:#fff; font-weight:bold;">0</span></div>
                                 <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">
                                     Discount (₹): 
-                                    <input type="number" id="billDiscount" class="text-right" style="width: 70px; color:#0f172a; border-radius:3px; padding:2px;" value="0" min="0" oninput="calculateTotals()">
+                                    <input type="number" id="billDiscount" class="text-right" style="width: 70px; color:#0f172a; border-radius:3px; padding:2px; font-weight:bold;" value="0" min="0" oninput="calculateTotals()">
                                 </div>
                             </div>
                             <div class="col-xs-6 text-right">
@@ -578,12 +643,12 @@
 <!-- PRINTABLE A5 SHEET TEMPLATE (Configured for A5 Sheet - 148mm x 210mm) -->
 <div id="printableA5Sheet" class="a5-container" style="display: none;">
     <div class="a5-header-title">
-        <h2>OPENPOS ESTIMATION</h2>
-        <div style="font-size: 13px; font-weight: bold; margin-top: 2px; color: #1e3a8a; letter-spacing: 1px;">
-            ESTIMATE QUOTATION (A5 SHEET)
+        <h2 style="margin: 0; font-size: 22px; font-weight: 800; color: #1e3a8a; letter-spacing: 0.5px;">SHRI MURUGAN PAINTS</h2>
+        <div style="font-size: 13px; font-weight: bold; margin-top: 3px; color: #b91c1c;">
+            Phone: 9940402460 / 9150585444
         </div>
-        <div style="font-size: 10px; color: #64748b; margin-top: 2px;">
-            ESTIMATION ONLY — NOT A TAX INVOICE
+        <div style="font-size: 11px; font-weight: bold; margin-top: 2px; color: #475569; letter-spacing: 1px;">
+            ESTIMATE / QUOTATION
         </div>
     </div>
 
@@ -594,7 +659,7 @@
         </div>
         <div style="text-align: right;">
             <div><b>Estimate No:</b> <span id="a5EstNo" style="font-weight: bold; color: #1e3a8a;">EST-0000</span></div>
-            <div><b>Date & Time:</b> <span id="a5Date">--/--/----</span></div>
+            <div><b>Date:</b> <span id="a5Date">--/--/----</span></div>
         </div>
     </div>
 
@@ -640,7 +705,7 @@
     </div>
 
     <div class="no-print" style="text-align: center; margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-        <button class="btn btn-primary" style="padding: 8px 24px; font-weight: bold;" onclick="window.print()">
+        <button class="btn btn-primary" style="padding: 8px 24px; font-weight: bold; background: #1e40af;" onclick="window.print()">
             <span class="glyphicon glyphicon-print"></span> Print A5 Now
         </button>
         <button class="btn btn-default" style="margin-left: 10px;" onclick="closeA5PrintView()">
@@ -649,42 +714,47 @@
     </div>
 </div>
 
-<!-- Modal: Add New Product to Catalog -->
-<div class="modal fade" id="modalAddProduct" tabindex="-1" role="dialog" style="display:none;">
-    <div class="modal-dialog modal-sm" role="document" style="margin-top: 60px;">
+<!-- Modal for Creating New Catalog Product -->
+<div class="modal fade" id="modalAddProduct" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" onclick="closeNewProductModal()">&times;</button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> Add Item to Catalog</h4>
+                <h4 class="modal-title"><b>Add New Product</b></h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Item Name</label>
-                    <input type="text" id="newProdName" class="form-control" placeholder="e.g. Tomato, Sugar">
+                    <label>Item Name *</label>
+                    <input type="text" id="newProdName" class="form-control input-sm" placeholder="e.g. Sheenlac Red 1 Ltr">
                 </div>
                 <div class="form-group">
-                    <label>Default Price ₹</label>
-                    <input type="number" id="newProdPrice" class="form-control" placeholder="0.00" step="any">
+                    <label>Default Price (₹)</label>
+                    <input type="number" id="newProdPrice" class="form-control input-sm" placeholder="0.00" step="any">
                 </div>
                 <div class="form-group">
-                    <label>Default Unit</label>
-                    <select id="newProdUnit" class="form-control">
-                        <option value="kg">kg</option>
-                        <option value="g">gram</option>
+                    <label>Pack Unit</label>
+                    <select id="newProdUnit" class="form-control input-sm">
                         <option value="pcs">pcs</option>
-                        <option value="pack">pack</option>
                         <option value="ltr">ltr</option>
+                        <option value="kg">kg</option>
+                        <option value="pack">pack</option>
                         <option value="box">box</option>
+                        <option value="can">can</option>
+                        <option value="tin">tin</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Category</label>
-                    <select id="newProdCategory" class="form-control">
-                        <option value="Vegetables">Vegetables</option>
-                        <option value="Groceries">Groceries</option>
-                        <option value="Fruits">Fruits</option>
-                        <option value="Dairy">Dairy</option>
-                        <option value="General">General</option>
+                    <select id="newProdCategory" class="form-control input-sm">
+                        <option value="Paints">Paints</option>
+                        <option value="Thinners">Thinners</option>
+                        <option value="Enamels">Enamels</option>
+                        <option value="Primers">Primers</option>
+                        <option value="Putty & Sealers">Putty & Sealers</option>
+                        <option value="Auto Paints">Auto Paints</option>
+                        <option value="Brushes & Tools">Brushes & Tools</option>
+                        <option value="Wood Finish">Wood Finish</option>
+                        <option value="General Hardware">General Hardware</option>
                     </select>
                 </div>
             </div>
@@ -697,10 +767,14 @@
 </div>
 
 <script>
-    // State variables
+    // Global Application State (Declared Once!)
     let catalogProducts = [];
     let activeCategory = 'All';
-    let currentEstimate = []; // Array of items: { id, name, unit, qty, price, total }
+    let searchQuery = '';
+    let displayLimit = 60;
+    let currentEstimate = [];
+    let activeSuggestionIndex = -1;
+    let currentSuggestions = [];
 
     // Vanilla Modal Helpers
     function openNewProductModal() {
@@ -724,6 +798,12 @@
         if (backdrop) backdrop.remove();
     }
 
+    function updateClock() {
+        const now = new Date();
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        document.getElementById('liveClock').innerText = now.toLocaleDateString('en-US', options);
+    }
+
     // On Load
     window.addEventListener('DOMContentLoaded', () => {
         updateClock();
@@ -731,62 +811,85 @@
         loadCatalog();
         loadEstimatesHistory();
 
-        // Keyboard Shortcut: Enter on Fast Entry adds the item
-        document.getElementById('entryName').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') document.getElementById('entryPrice').focus();
+        const entryNameInput = document.getElementById('entryName');
+        const entryPriceInput = document.getElementById('entryPrice');
+        const entryQtyInput = document.getElementById('entryQty');
+
+        // Dynamic typing into Item Name: Instant Suggestions List View
+        entryNameInput.addEventListener('input', (e) => {
+            handleFastEntryInput(e.target.value);
         });
-        document.getElementById('entryPrice').addEventListener('keydown', (e) => {
+
+        // Keyboard Navigation for Suggestions Dropdown & Fast Entry
+        entryNameInput.addEventListener('keydown', (e) => {
+            const dropdown = document.getElementById('entrySuggestionsDropdown');
+            const isVisible = dropdown.style.display === 'block';
+
+            if (e.key === 'ArrowDown') {
+                if (isVisible && currentSuggestions.length > 0) {
+                    e.preventDefault();
+                    activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestions.length - 1);
+                    highlightActiveSuggestion();
+                }
+            } else if (e.key === 'ArrowUp') {
+                if (isVisible && currentSuggestions.length > 0) {
+                    e.preventDefault();
+                    activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+                    highlightActiveSuggestion();
+                }
+            } else if (e.key === 'Enter') {
+                if (isVisible && activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestions.length) {
+                    e.preventDefault();
+                    selectSuggestion(currentSuggestions[activeSuggestionIndex]);
+                } else {
+                    e.preventDefault();
+                    entryPriceInput.focus();
+                    entryPriceInput.select();
+                }
+            } else if (e.key === 'Escape') {
+                hideSuggestions();
+            }
+        });
+
+        entryPriceInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') addManualItem();
         });
-        document.getElementById('entryQty').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') document.getElementById('entryPrice').focus();
+
+        entryQtyInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                entryPriceInput.focus();
+                entryPriceInput.select();
+            }
         });
 
-        // Autocomplete typing filter
-        document.getElementById('entryName').addEventListener('input', (e) => {
-            updateDatalist(e.target.value.trim());
-        });
-
-        // Autocomplete selection
-        document.getElementById('entryName').addEventListener('change', (e) => {
-            const val = e.target.value.trim().toLowerCase();
-            const found = catalogProducts.find(p => p.name.toLowerCase() === val);
-            if (found) {
-                document.getElementById('entryPrice').value = found.default_price || '';
-                document.getElementById('entryUnit').value = found.unit || 'pcs';
-                document.getElementById('entryPrice').focus();
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.fast-entry-box')) {
+                hideSuggestions();
             }
         });
     });
 
-    function updateClock() {
-        const now = new Date();
-        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        document.getElementById('liveClock').innerText = now.toLocaleDateString('en-US', options);
-    }
-
-    let catalogProducts = [];
-    let activeCategory = 'All';
-    let searchQuery = '';
-    let displayLimit = 60;
-    let currentEstimate = []; // Array of items: { id, name, unit, qty, price, total }
-
     // 1. Fetch & Render Catalog
     async function loadCatalog() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 25px; text-align: center; color: #64748b;"><span class="glyphicon glyphicon-refresh"></span> Loading 14,900+ items...</div>';
+
         try {
-            const res = await fetch('/api/products');
-            if (res.ok) {
-                catalogProducts = await res.json();
+            // First try direct products.json static fetch (fastest)
+            const resJson = await fetch('/products.json');
+            if (resJson.ok) {
+                catalogProducts = await resJson.json();
             } else {
-                throw new Error("API not available");
+                throw new Error("products.json not reachable");
             }
         } catch (err) {
             try {
-                const resJson = await fetch('/products.json');
-                if (resJson.ok) {
-                    catalogProducts = await resJson.json();
+                const res = await fetch('/api/products');
+                if (res.ok) {
+                    catalogProducts = await res.json();
                 } else {
-                    throw new Error("products.json not available");
+                    throw new Error("API not reachable");
                 }
             } catch (e) {
                 const stored = localStorage.getItem('openpos_catalog');
@@ -795,16 +898,99 @@
                 }
             }
         }
-        displayLimit = 60;
+
         renderCatalog();
-        updateDatalist('');
     }
 
+    // Suggestions List View Logic
+    function handleFastEntryInput(val) {
+        const query = val.trim().toLowerCase();
+        const dropdown = document.getElementById('entrySuggestionsDropdown');
+
+        if (!query || query.length === 0) {
+            hideSuggestions();
+            return;
+        }
+
+        const terms = query.split(/\s+/).filter(Boolean);
+        currentSuggestions = catalogProducts.filter(p => {
+            const name = (p.name || '').toLowerCase();
+            const cat = (p.category || '').toLowerCase();
+            return terms.every(t => name.includes(t) || cat.includes(t));
+        }).slice(0, 20);
+
+        if (currentSuggestions.length === 0) {
+            dropdown.innerHTML = '<div style="padding: 10px; color: #64748b; font-size: 12px; text-align: center;">No matching items found. Type custom name & price to add.</div>';
+            dropdown.style.display = 'block';
+            activeSuggestionIndex = -1;
+            return;
+        }
+
+        activeSuggestionIndex = 0;
+        let html = '';
+        currentSuggestions.forEach((p, idx) => {
+            const price = Number(p.default_price || 0).toFixed(2);
+            html += `
+                <div class="suggestion-item ${idx === 0 ? 'active' : ''}" data-index="${idx}" onclick="selectSuggestionByIndex(${idx})">
+                    <div class="item-info">
+                        <span class="item-title">${escapeHtml(p.name)}</span>
+                        <span class="item-sub">${escapeHtml(p.category || 'General')} • ${escapeHtml(p.unit || 'pcs')}</span>
+                    </div>
+                    <div class="item-price">₹ ${price}</div>
+                </div>
+            `;
+        });
+
+        dropdown.innerHTML = html;
+        dropdown.style.display = 'block';
+    }
+
+    function selectSuggestionByIndex(idx) {
+        if (idx >= 0 && idx < currentSuggestions.length) {
+            selectSuggestion(currentSuggestions[idx]);
+        }
+    }
+
+    function selectSuggestion(p) {
+        document.getElementById('entryName').value = p.name;
+        document.getElementById('entryUnit').value = p.unit || 'pcs';
+        document.getElementById('entryPrice').value = p.default_price || '';
+        hideSuggestions();
+
+        const priceInput = document.getElementById('entryPrice');
+        priceInput.focus();
+        priceInput.select();
+    }
+
+    function highlightActiveSuggestion() {
+        const dropdown = document.getElementById('entrySuggestionsDropdown');
+        const items = dropdown.querySelectorAll('.suggestion-item');
+        items.forEach((item, idx) => {
+            if (idx === activeSuggestionIndex) {
+                item.classList.add('active');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    function hideSuggestions() {
+        const dropdown = document.getElementById('entrySuggestionsDropdown');
+        dropdown.style.display = 'none';
+        activeSuggestionIndex = -1;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Catalog Grid Search & Filter
     function onSearchCatalog(val) {
         searchQuery = val.trim().toLowerCase();
         displayLimit = 60;
         renderCatalog();
-        updateDatalist(searchQuery);
     }
 
     function filterCategory(cat) {
@@ -837,8 +1023,8 @@
         if (searchQuery) {
             const terms = searchQuery.split(/\s+/).filter(Boolean);
             filtered = filtered.filter(p => {
-                const nameLow = p.name.toLowerCase();
-                const catLow = p.category ? p.category.toLowerCase() : '';
+                const nameLow = (p.name || '').toLowerCase();
+                const catLow = (p.category || '').toLowerCase();
                 return terms.every(t => nameLow.includes(t) || catLow.includes(t));
             });
         }
@@ -862,12 +1048,12 @@
             card.onclick = () => selectCatalogItem(p);
             card.innerHTML = `
                 <div style="position: relative;">
-                    <div class="p-name" style="font-size: 12px; font-weight: 600; line-height: 1.3;">${p.name}</div>
-                    <div style="font-size: 10px; color: #64748b; margin-top: 2px;">${p.category}</div>
+                    <div class="p-name" style="font-size: 12px; font-weight: 600; line-height: 1.3;">${escapeHtml(p.name)}</div>
+                    <div style="font-size: 10px; color: #64748b; margin-top: 2px;">${escapeHtml(p.category)}</div>
                 </div>
                 <div>
                     <span class="p-price">₹ ${Number(p.default_price).toFixed(2)}</span>
-                    <span style="font-size: 10px; color: #64748b;">/${p.unit}</span>
+                    <span style="font-size: 10px; color: #64748b;">/${escapeHtml(p.unit)}</span>
                 </div>
             `;
             grid.appendChild(card);
@@ -879,55 +1065,19 @@
         }
     }
 
-    function updateDatalist(query) {
-        const dl = document.getElementById('catalogDatalist');
-        if (!dl) return;
-        dl.innerHTML = '';
-        if (!catalogProducts || catalogProducts.length === 0) return;
-
-        let matches = catalogProducts;
-        if (query && query.length >= 2) {
-            const q = query.toLowerCase();
-            matches = catalogProducts.filter(p => p.name.toLowerCase().includes(q)).slice(0, 30);
-        } else {
-            matches = catalogProducts.slice(0, 30);
-        }
-
-        matches.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.name;
-            opt.label = '₹' + Number(p.default_price).toFixed(2) + '/' + p.unit;
-            dl.appendChild(opt);
-        });
-    }
-
-    async function deleteProduct(id, e) {
-        if (e) e.stopPropagation();
-        if (!confirm("Delete this product from catalog?")) return;
-        try {
-            await fetch('/api/products/' + id, { method: 'DELETE' });
-            loadCatalog();
-        } catch(err) {
-            alert(err.message);
-        }
-    }
-
-    // When an item card is clicked: Populate fast entry with price focused for instant adjustment
     function selectCatalogItem(p) {
         document.getElementById('entryName').value = p.name;
-        document.getElementById('entryUnit').value = p.unit || 'kg';
+        document.getElementById('entryUnit').value = p.unit || 'pcs';
         document.getElementById('entryPrice').value = p.default_price || '';
         document.getElementById('entryQty').value = '1';
         
-        // Directly add to estimate, with price editable in the table row
         addItemToEstimate({
             name: p.name,
-            unit: p.unit || 'kg',
+            unit: p.unit || 'pcs',
             qty: 1,
             price: parseFloat(p.default_price) || 0
         });
 
-        // Also focus price in entry box for quick feedback
         const priceInput = document.getElementById('entryPrice');
         priceInput.focus();
         priceInput.select();
@@ -969,14 +1119,13 @@
         qtyInput.value = '1';
         priceInput.value = '';
         nameInput.focus();
+        hideSuggestions();
     }
 
     function addItemToEstimate(item) {
-        // Check if item with same name & unit exists; if so, update qty
         const existingIndex = currentEstimate.findIndex(x => x.name.toLowerCase() === item.name.toLowerCase() && x.unit === item.unit);
         if (existingIndex > -1) {
             currentEstimate[existingIndex].qty += item.qty;
-            // update price to latest manual price entered
             currentEstimate[existingIndex].price = item.price;
             currentEstimate[existingIndex].total = currentEstimate[existingIndex].qty * item.price;
         } else {
@@ -1001,7 +1150,7 @@
                     <td colspan="6" class="text-center text-muted" style="padding: 40px 10px;">
                         <span class="glyphicon glyphicon-inbox" style="font-size: 32px; color: #cbd5e1;"></span><br>
                         <b style="color: #64748b;">Estimation bill is empty</b><br>
-                        <small>Click products or enter custom item and price above</small>
+                        <small>Type item name above or click products from catalog to add</small>
                     </td>
                 </tr>
             `;
@@ -1015,8 +1164,8 @@
             tr.innerHTML = `
                 <td class="text-center" style="color:#64748b;">${index + 1}</td>
                 <td>
-                    <b>${item.name}</b>
-                    <span style="font-size:11px; color:#64748b; margin-left:4px;">(${item.unit})</span>
+                    <b>${escapeHtml(item.name)}</b>
+                    <span style="font-size:11px; color:#64748b; margin-left:4px;">(${escapeHtml(item.unit)})</span>
                 </td>
                 <td class="text-center">
                     <input type="number" class="qty-inline-input" value="${item.qty}" step="any" min="0.01" 
@@ -1045,14 +1194,12 @@
         calculateTotals();
     }
 
-    // Dynamic Price Modification in Table Row
     function updateItemPrice(index, newPriceVal) {
         const val = parseFloat(newPriceVal);
         if (!isNaN(val) && val >= 0) {
             currentEstimate[index].price = val;
             currentEstimate[index].total = currentEstimate[index].qty * val;
             calculateTotals();
-            // Update row total cell
             const tbody = document.getElementById('estimateItemsList');
             const row = tbody.children[index];
             if (row) {
@@ -1090,17 +1237,12 @@
             document.getElementById('custName').value = '';
             document.getElementById('custPhone').value = '';
             document.getElementById('billDiscount').value = '0';
-            document.getElementById('currentBillNo').innerText = 'EST-DRAFT';
             document.getElementById('entryName').value = '';
             document.getElementById('entryPrice').value = '';
             document.getElementById('entryQty').value = '1';
             renderEstimateTable();
             alert("All items have been canceled.");
         }
-    }
-
-    function clearCurrentBill() {
-        cancelAllItems();
     }
 
     function calculateTotals() {
@@ -1139,6 +1281,9 @@
             customer_phone: document.getElementById('custPhone').value.trim()
         };
 
+        const now = new Date();
+        const dateOnly = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+
         try {
             const res = await fetch('/api/estimates', {
                 method: 'POST',
@@ -1148,8 +1293,9 @@
             if (res.ok) {
                 const data = await res.json();
                 if (data.success) {
-                    alert(`Estimate saved successfully!\nEstimate No: ${data.estimate_no}\nTotal: ₹${grandTotal.toFixed(2)}`);
-                    document.getElementById('currentBillNo').innerText = data.estimate_no;
+                    alert(`Estimate saved successfully!
+Estimate No: ${data.estimate_no}
+Total: ₹${grandTotal.toFixed(2)}`);
                     loadEstimatesHistory();
                     return;
                 }
@@ -1157,11 +1303,11 @@
             throw new Error("Offline save");
         } catch (err) {
             let history = JSON.parse(localStorage.getItem('openpos_estimates') || '[]');
-            const estNo = 'EST-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + String(history.length + 1).padStart(4, '0');
+            const estNo = 'EST-' + now.toISOString().slice(0,10).replace(/-/g,'') + '-' + String(history.length + 1).padStart(4, '0');
             const newRecord = {
                 id: Date.now(),
                 estimate_no: estNo,
-                created_at: new Date().toLocaleString('en-US'),
+                created_at: dateOnly,
                 customer_name: payload.customer_name,
                 customer_phone: payload.customer_phone,
                 subtotal: payload.subtotal,
@@ -1171,13 +1317,14 @@
             };
             history.unshift(newRecord);
             localStorage.setItem('openpos_estimates', JSON.stringify(history));
-            alert(`Estimate saved successfully!\nEstimate No: ${estNo}\nTotal: ₹${grandTotal.toFixed(2)}`);
-            document.getElementById('currentBillNo').innerText = estNo;
+            alert(`Estimate saved successfully!
+Estimate No: ${estNo}
+Total: ₹${grandTotal.toFixed(2)}`);
             loadEstimatesHistory();
         }
     }
 
-    // 5. Print Estimation Sheet (A5 Format: 148mm x 210mm)
+    // 5. Print Estimation Sheet (A5 Format: Date ONLY, NO TIME)
     function printEstimationA5() {
         if (currentEstimate.length === 0) {
             alert("Estimation bill is empty. Please add items before printing.");
@@ -1191,12 +1338,18 @@
 
         const custName = document.getElementById('custName').value.trim();
         const custPhone = document.getElementById('custPhone').value.trim();
-        const estNo = document.getElementById('currentBillNo').innerText;
 
-        document.getElementById('a5EstNo').innerText = estNo === 'EST-DRAFT' ? ('EST-' + Date.now().toString().slice(-6)) : estNo;
-        document.getElementById('a5Date').innerText = new Date().toLocaleString('en-US');
+        // STRICTLY DATE ONLY - NO TIME IN THE BILL
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        const dateOnlyStr = `${day}/${month}/${year}`;
+
+        document.getElementById('a5EstNo').innerText = 'EST-' + Date.now().toString().slice(-6);
+        document.getElementById('a5Date').innerText = dateOnlyStr;
         document.getElementById('a5CustName').innerText = custName || 'Cash / Walk-in Customer';
-        document.getElementById('a5CustPhone').innerText = custPhone || 'N/A';
+        document.getElementById('a5CustPhone').innerText = custPhone || '-';
 
         const tbody = document.getElementById('a5ItemsBody');
         tbody.innerHTML = '';
@@ -1204,8 +1357,8 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="text-align: center; color: #64748b;">${idx + 1}</td>
-                <td><b>${item.name}</b></td>
-                <td style="text-align: center;">${item.qty} ${item.unit}</td>
+                <td><b>${escapeHtml(item.name)}</b></td>
+                <td style="text-align: center;">${item.qty} ${escapeHtml(item.unit)}</td>
                 <td style="text-align: right;">${item.price.toFixed(2)}</td>
                 <td style="text-align: right; font-weight: 600;">${(item.qty * item.price).toFixed(2)}</td>
             `;
@@ -1228,16 +1381,8 @@
         window.print();
     }
 
-    function printEstimationSlip() {
-        printEstimationA5();
-    }
-
     function closeA5PrintView() {
         document.getElementById('printableA5Sheet').style.display = 'none';
-    }
-
-    function closePrintView() {
-        closeA5PrintView();
     }
 
     // 6. Recent Estimations History
@@ -1263,10 +1408,12 @@
         tbody.innerHTML = '';
         data.forEach(item => {
             const tr = document.createElement('tr');
+            // Extract date only (strip time if present)
+            let dateStr = (item.created_at || '').split(' ')[0] || '--/--/----';
             tr.innerHTML = `
-                <td><b>${item.estimate_no}</b></td>
-                <td style="font-size:11px;">${item.created_at}</td>
-                <td>${item.customer_name || '-'}</td>
+                <td><b>${escapeHtml(item.estimate_no)}</b></td>
+                <td style="font-size:11px;">${escapeHtml(dateStr)}</td>
+                <td>${escapeHtml(item.customer_name || '-')}</td>
                 <td class="text-right" style="font-weight:bold; color:#15803d;">₹ ${Number(item.grand_total).toFixed(2)}</td>
                 <td class="text-center">
                     <button class="btn btn-xs btn-info" title="Reload into bill" onclick='reloadEstimate(${JSON.stringify(item)})'>
@@ -1286,7 +1433,6 @@
             return;
         }
         currentEstimate = est.items || [];
-        document.getElementById('currentBillNo').innerText = est.estimate_no;
         document.getElementById('custName').value = est.customer_name || '';
         document.getElementById('custPhone').value = est.customer_phone || '';
         document.getElementById('billDiscount').value = est.discount || 0;
@@ -1329,13 +1475,11 @@
             }
         } catch (err) {}
 
-        catalogProducts.push(newProd);
-        localStorage.setItem('openpos_catalog', JSON.stringify(catalogProducts));
+        catalogProducts.unshift(newProd);
         closeNewProductModal();
         document.getElementById('newProdName').value = '';
         document.getElementById('newProdPrice').value = '';
         renderCatalog();
-        updateDatalist();
     }
 </script>
 </body>

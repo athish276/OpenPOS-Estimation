@@ -11,7 +11,7 @@ import json
 import sqlite3
 import mimetypes
 from urllib.parse import urlparse, parse_qs
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 
 PORT = int(os.environ.get("PORT", 3000))
@@ -213,7 +213,7 @@ class PosRequestHandler(BaseHTTPRequestHandler):
                 "success": True,
                 "id": est_id,
                 "estimate_no": estimate_no,
-                "created_at": datetime.now().strftime("%d/%m/%Y %I:%M %p")
+                "created_at": datetime.now().strftime("%d/%m/%Y")
             }, status=201)
 
         self.send_response(404)
@@ -252,7 +252,7 @@ class PosRequestHandler(BaseHTTPRequestHandler):
 def run_server():
     init_db()
     server_address = ("0.0.0.0", PORT)
-    httpd = HTTPServer(server_address, PosRequestHandler)
+    httpd = ThreadingHTTPServer(server_address, PosRequestHandler)
     print(f"OpenPOS Estimation Server running at http://localhost:{PORT}/")
     print(f"Accessible on local network via http://0.0.0.0:{PORT}/")
     try:
