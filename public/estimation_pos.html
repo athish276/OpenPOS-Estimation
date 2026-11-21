@@ -428,15 +428,32 @@
                     <!-- Category Filter Buttons -->
                     <div class="category-nav" id="categoryNav">
                         <button class="btn btn-xs btn-primary active" onclick="filterCategory('All')">All</button>
-                        <button class="btn btn-xs btn-default" onclick="filterCategory('Vegetables')">Vegetables</button>
-                        <button class="btn btn-xs btn-default" onclick="filterCategory('Groceries')">Groceries</button>
-                        <button class="btn btn-xs btn-default" onclick="filterCategory('Fruits')">Fruits</button>
-                        <button class="btn btn-xs btn-default" onclick="filterCategory('Dairy')">Dairy</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Paints')">Paints</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Thinners')">Thinners</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Enamels')">Enamels</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Primers')">Primers</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Putty & Sealers')">Putty</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Auto Paints')">Auto</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Brushes & Tools')">Brushes & Tools</button>
+                        <button class="btn btn-xs btn-default" onclick="filterCategory('Wood Finish')">Wood Finish</button>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div style="margin-bottom: 12px; position: relative;">
+                        <input type="text" id="catalogSearchInput" class="form-control input-sm" 
+                               placeholder="🔍 Search 14,000+ items (e.g. Sheenlac, Thinner, Necol, 1 Ltr, Primer)..." 
+                               oninput="onSearchCatalog(this.value)">
+                        <span id="searchResultCount" style="position: absolute; right: 10px; top: 6px; font-size: 11px; color: #64748b; font-weight: 600;"></span>
                     </div>
 
                     <!-- Products Grid -->
                     <div class="product-grid" id="productGrid">
                         <!-- Populated via JavaScript -->
+                    </div>
+                    <div id="loadMoreContainer" style="text-align: center; margin-top: 10px; display: none;">
+                        <button class="btn btn-xs btn-default" style="padding: 4px 16px; font-weight: 600;" onclick="loadMoreProducts()">
+                            Load More Items...
+                        </button>
                     </div>
                 </div>
             </div>
@@ -725,13 +742,18 @@
             if (e.key === 'Enter') document.getElementById('entryPrice').focus();
         });
 
+        // Autocomplete typing filter
+        document.getElementById('entryName').addEventListener('input', (e) => {
+            updateDatalist(e.target.value.trim());
+        });
+
         // Autocomplete selection
         document.getElementById('entryName').addEventListener('change', (e) => {
             const val = e.target.value.trim().toLowerCase();
             const found = catalogProducts.find(p => p.name.toLowerCase() === val);
             if (found) {
                 document.getElementById('entryPrice').value = found.default_price || '';
-                document.getElementById('entryUnit').value = found.unit || 'kg';
+                document.getElementById('entryUnit').value = found.unit || 'pcs';
                 document.getElementById('entryPrice').focus();
             }
         });
@@ -743,23 +765,11 @@
         document.getElementById('liveClock').innerText = now.toLocaleDateString('en-US', options);
     }
 
-    const defaultCatalogSeed = [
-        { id: 1, name: "Tomato", default_price: 40.0, unit: "kg", category: "Vegetables" },
-        { id: 2, name: "Onion", default_price: 50.0, unit: "kg", category: "Vegetables" },
-        { id: 3, name: "Potato", default_price: 35.0, unit: "kg", category: "Vegetables" },
-        { id: 4, name: "Carrot", default_price: 60.0, unit: "kg", category: "Vegetables" },
-        { id: 5, name: "Green Chilli", default_price: 80.0, unit: "kg", category: "Vegetables" },
-        { id: 6, name: "Ponni Rice", default_price: 62.0, unit: "kg", category: "Groceries" },
-        { id: 7, name: "Toor Dal", default_price: 160.0, unit: "kg", category: "Groceries" },
-        { id: 8, name: "Sugar", default_price: 44.0, unit: "kg", category: "Groceries" },
-        { id: 9, name: "Sunflower Oil", default_price: 145.0, unit: "ltr", category: "Groceries" },
-        { id: 10, name: "Atta Flour", default_price: 52.0, unit: "kg", category: "Groceries" },
-        { id: 11, name: "Apple", default_price: 180.0, unit: "kg", category: "Fruits" },
-        { id: 12, name: "Banana", default_price: 50.0, unit: "dozen", category: "Fruits" },
-        { id: 13, name: "Milk", default_price: 30.0, unit: "packet", category: "Dairy" },
-        { id: 14, name: "Tea Powder", default_price: 95.0, unit: "pack", category: "Groceries" },
-        { id: 15, name: "Coffee Powder", default_price: 120.0, unit: "pack", category: "Groceries" }
-    ];
+    let catalogProducts = [];
+    let activeCategory = 'All';
+    let searchQuery = '';
+    let displayLimit = 60;
+    let currentEstimate = []; // Array of items: { id, name, unit, qty, price, total }
 
     // 1. Fetch & Render Catalog
     async function loadCatalog() {
@@ -771,31 +781,35 @@
                 throw new Error("API not available");
             }
         } catch (err) {
-            const stored = localStorage.getItem('openpos_catalog');
-            if (stored) {
-                catalogProducts = JSON.parse(stored);
-            } else {
-                catalogProducts = defaultCatalogSeed;
-                localStorage.setItem('openpos_catalog', JSON.stringify(defaultCatalogSeed));
+            try {
+                const resJson = await fetch('/products.json');
+                if (resJson.ok) {
+                    catalogProducts = await resJson.json();
+                } else {
+                    throw new Error("products.json not available");
+                }
+            } catch (e) {
+                const stored = localStorage.getItem('openpos_catalog');
+                if (stored) {
+                    catalogProducts = JSON.parse(stored);
+                }
             }
         }
+        displayLimit = 60;
         renderCatalog();
-        updateDatalist();
+        updateDatalist('');
     }
 
-    function updateDatalist() {
-        const dl = document.getElementById('catalogDatalist');
-        dl.innerHTML = '';
-        catalogProducts.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.name;
-            opt.label = '₹' + Number(p.default_price).toFixed(2) + '/' + p.unit;
-            dl.appendChild(opt);
-        });
+    function onSearchCatalog(val) {
+        searchQuery = val.trim().toLowerCase();
+        displayLimit = 60;
+        renderCatalog();
+        updateDatalist(searchQuery);
     }
 
     function filterCategory(cat) {
         activeCategory = cat;
+        displayLimit = 60;
         const btns = document.querySelectorAll('#categoryNav .btn');
         btns.forEach(b => {
             if (b.innerText === cat || (cat === 'All' && b.innerText === 'All')) {
@@ -807,29 +821,49 @@
         renderCatalog();
     }
 
+    function loadMoreProducts() {
+        displayLimit += 60;
+        renderCatalog();
+    }
+
     function renderCatalog() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
-        const filtered = activeCategory === 'All' 
-            ? catalogProducts 
-            : catalogProducts.filter(p => p.category === activeCategory);
+
+        let filtered = catalogProducts;
+        if (activeCategory !== 'All') {
+            filtered = filtered.filter(p => p.category === activeCategory);
+        }
+        if (searchQuery) {
+            const terms = searchQuery.split(/\s+/).filter(Boolean);
+            filtered = filtered.filter(p => {
+                const nameLow = p.name.toLowerCase();
+                const catLow = p.category ? p.category.toLowerCase() : '';
+                return terms.every(t => nameLow.includes(t) || catLow.includes(t));
+            });
+        }
+
+        const countBadge = document.getElementById('searchResultCount');
+        if (countBadge) {
+            countBadge.innerText = filtered.length.toLocaleString() + ' items';
+        }
 
         if (filtered.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: #94a3b8;">No products in this category.</div>';
+            grid.innerHTML = '<div style="grid-column: 1/-1; padding: 25px; text-align: center; color: #94a3b8;">No matching items found.</div>';
+            const loadMoreBtn = document.getElementById('loadMoreContainer');
+            if (loadMoreBtn) loadMoreBtn.style.display = 'none';
             return;
         }
 
-        filtered.forEach(p => {
+        const slice = filtered.slice(0, displayLimit);
+        slice.forEach(p => {
             const card = document.createElement('div');
             card.className = 'product-card';
             card.onclick = () => selectCatalogItem(p);
             card.innerHTML = `
                 <div style="position: relative;">
-                    <button class="btn btn-xs btn-link text-danger" style="position: absolute; right: -6px; top: -8px; padding: 0 4px; font-size: 14px; text-decoration: none;" title="Delete product from catalog" onclick="deleteProduct(${p.id}, event)">
-                        &times;
-                    </button>
-                    <div class="p-name" style="padding-right: 12px;">${p.name}</div>
-                    <div style="font-size: 11px; color: #64748b;">${p.category}</div>
+                    <div class="p-name" style="font-size: 12px; font-weight: 600; line-height: 1.3;">${p.name}</div>
+                    <div style="font-size: 10px; color: #64748b; margin-top: 2px;">${p.category}</div>
                 </div>
                 <div>
                     <span class="p-price">₹ ${Number(p.default_price).toFixed(2)}</span>
@@ -837,6 +871,33 @@
                 </div>
             `;
             grid.appendChild(card);
+        });
+
+        const loadMoreBtn = document.getElementById('loadMoreContainer');
+        if (loadMoreBtn) {
+            loadMoreBtn.style.display = filtered.length > displayLimit ? 'block' : 'none';
+        }
+    }
+
+    function updateDatalist(query) {
+        const dl = document.getElementById('catalogDatalist');
+        if (!dl) return;
+        dl.innerHTML = '';
+        if (!catalogProducts || catalogProducts.length === 0) return;
+
+        let matches = catalogProducts;
+        if (query && query.length >= 2) {
+            const q = query.toLowerCase();
+            matches = catalogProducts.filter(p => p.name.toLowerCase().includes(q)).slice(0, 30);
+        } else {
+            matches = catalogProducts.slice(0, 30);
+        }
+
+        matches.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            opt.label = '₹' + Number(p.default_price).toFixed(2) + '/' + p.unit;
+            dl.appendChild(opt);
         });
     }
 
